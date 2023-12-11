@@ -9,6 +9,7 @@ import Input from "./components/Input";
 
 const Popup = () => {
   const [openAIKey, setOpenAIKey] = useState<string | undefined>("");
+  const [apiURL, setApiURL] = useState<string>("");
   const [types, setTypes] = useState<string[]>([]);
   const [isOn, setIsOn] = useState<boolean | undefined>(true);
   const [newType, setNewType] = useState<string>("");
@@ -16,6 +17,7 @@ const Popup = () => {
 
   useEffect(() => {
     getStorage<string>("openai_key").then(setOpenAIKey);
+    getStorage<string>("apiURL").then(setApiURL);
     getStorage<boolean>("isOn").then(setIsOn);
     getStorage<string[]>("types").then((types) => {
       if (!types) {
@@ -34,6 +36,14 @@ const Popup = () => {
   const updateKeyInStorage = useCallback(() => {
     setStorage("openai_key", openAIKey);
   }, [openAIKey]);
+
+  const updateApiUrl = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setApiURL(e.target.value);
+  }, []);
+
+  const updateApiUrlInStorage = useCallback(() => {
+    setStorage("apiURL", apiURL);
+  }, [apiURL]);
 
   const getAllTabsInfo = async () => {
     if (!openAIKey || !types || !types.length) {
@@ -92,7 +102,37 @@ const Popup = () => {
           </a>
         </div>
       )}
+      <div className="relative mb-2">
+        <label
+          className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-900"
+          htmlFor="api-url"
+        >
+          API URL
+        </label>
 
+        <Input
+          id="api-url"
+          type="text"
+          onChange={updateApiUrl}
+          onBlur={updateApiUrlInStorage}
+          value={apiURL}
+          placeholder="Your API URL"
+        />
+      </div>
+      {!apiURL?.length && (
+        <div className="text-sm text-gray-500 mb-2">
+          If you use reserve api like {""}
+          <a
+            href="https://github.com/pandora-next"
+            target="_blank"
+            rel="noreferrer"
+            className="text-primary/lg underline underline-offset-2 hover:text-primary"
+          >
+            pandora
+          </a>
+          you can input your url/v1/chat/completions here
+        </div>
+      )}
       <div className="flex flex-col gap-y-2 mb-2">
         <form
           onSubmit={(e) => {
